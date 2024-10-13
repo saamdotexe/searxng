@@ -773,6 +773,13 @@ def search():
     # search_query.lang contains the user choice (all, auto, en, ...)
     # when the user choice is "auto", search.search_query.lang contains the detected language
     # otherwise it is equals to search_query.lang
+
+
+    if output_format == 'json_extended':
+        response = webutils.get_extended_json_response(search_query, result_container, engine_timings_pairs, max_response_time)
+        print("RETURNING", response)
+        return Response(response, mimetype='application/json')
+
     return render(
         # fmt: off
         'results.html',

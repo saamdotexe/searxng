@@ -18,7 +18,7 @@ from typing import Iterable, List, Tuple, Dict, TYPE_CHECKING
 from io import StringIO
 from codecs import getincrementalencoder
 
-from flask_babel import gettext, format_date  # type: ignore
+from flask_babel import gettext, format_date, format_decimal  # type: ignore
 
 from searx import logger, settings
 from searx.engines import DEFAULT_CATEGORY
@@ -155,6 +155,45 @@ class JSONEncoder(json.JSONEncoder):  # pylint: disable=missing-class-docstring
             return list(o)
         return super().default(o)
 
+def get_extended_json_response(sq: SearchQuery, rc: ResultContainer, et, mrt) -> str:
+    """Returns the JSON string of the results to a query (``application/json``)"""
+    results = rc.number_of_results
+    x = {
+        'query': sq.query,
+        'number_of_results': results,
+        'results': rc.get_ordered_results(),
+        'answers': list(rc.answers),
+        'corrections': list(rc.corrections),
+        'infoboxes': rc.infoboxes,
+        'suggestions': list(rc.suggestions),
+        'unresponsive_engines': get_translated_errors(rc.unresponsive_engines),
+        
+        'selected_categories': sq.categories,
+        'pageno': sq.pageno,
+        'time_range': sq.time_range or '',
+        'number_of_results': format_decimal(rc.number_of_results),
+        # 'suggestions': suggesustion_urls,
+        'answers': rc.answers,
+        # 'corrections': correction_urls,
+        'infoboxes': rc.infoboxes,
+        'engine_data': rc.engine_data,
+        'paging': rc.paging,
+        'unresponsive_engines': get_translated_errors(
+            rc.unresponsive_engines
+        ),
+        # 'current_locale': request.preferences.get_value('locale'),
+        # 'current_language': selected_locale,
+        # 'search_language': match_locale(
+        #     search.search_query.lang,
+        #     settings['search']['languages'],
+        #     fallback=request.preferences.get_value('language')
+        # ),
+        # 'timeout_limit': request.form.get('timeout_limit', None),
+        'timings': et,
+        'max_response_time': mrt
+    }
+    response = json.dumps(x, cls=JSONEncoder)
+    return response
 
 def get_json_response(sq: SearchQuery, rc: ResultContainer) -> str:
     """Returns the JSON string of the results to a query (``application/json``)"""
