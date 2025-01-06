@@ -87,10 +87,7 @@ from searx.webadapter import (
     get_selected_categories,
     parse_lang,
 )
-from searx.utils import (
-    gen_useragent,
-    dict_subset,
-)
+from searx.utils import gen_useragent, dict_subset
 from searx.version import VERSION_STRING, GIT_URL, GIT_BRANCH
 from searx.query import RawTextQuery
 from searx.plugins import Plugin, plugins, initialize as plugin_initialize
@@ -104,13 +101,7 @@ from searx.answerers import (
     answerers,
     ask,
 )
-from searx.metrics import (
-    get_engines_stats,
-    get_engine_errors,
-    get_reliabilities,
-    histogram,
-    counter,
-)
+from searx.metrics import get_engines_stats, get_engine_errors, get_reliabilities, histogram, counter, openmetrics
 from searx.flaskfix import patch_application
 
 from searx.locales import (
@@ -349,6 +340,14 @@ def get_enabled_categories(category_names: Iterable[str]):
 
 
 def get_pretty_url(parsed_url: urllib.parse.ParseResult):
+    url_formatting_pref = request.preferences.get_value('url_formatting')
+
+    if url_formatting_pref == 'full':
+        return [parsed_url.geturl()]
+
+    if url_formatting_pref == 'host':
+        return [parsed_url.netloc]
+
     path = parsed_url.path
     path = path[:-1] if len(path) > 0 and path[-1] == '/' else path
     path = unquote(path.replace("/", " › "))
@@ -358,28 +357,40 @@ def get_pretty_url(parsed_url: urllib.parse.ParseResult):
 def get_client_settings():
     req_pref = request.preferences
     return {
-        'autocomplete_provider': req_pref.get_value('autocomplete'),
+        'autocomplete': req_pref.get_value('autocomplete'),
         'autocomplete_min': get_setting('search.autocomplete_min'),
-        'http_method': req_pref.get_value('method'),
+        'method': req_pref.get_value('method'),
         'infinite_scroll': req_pref.get_value('infinite_scroll'),
         'translations': get_translations(),
         'search_on_category_select': req_pref.get_value('search_on_category_select'),
         'hotkeys': req_pref.get_value('hotkeys'),
+        'url_formatting': req_pref.get_value('url_formatting'),
         'theme_static_path': custom_url_for('static', filename='themes/simple'),
+        'results_on_new_tab': req_pref.get_value('results_on_new_tab'),
+        'favicon_resolver': req_pref.get_value('favicon_resolver'),
+        'advanced_search': req_pref.get_value('advanced_search'),
+        'query_in_title': req_pref.get_value('query_in_title'),
+        'safesearch': str(req_pref.get_value('safesearch')),
+        'theme': req_pref.get_value('theme'),
+        'doi_resolver': get_doi_resolver(req_pref),
     }
 
 
 def render(template_name: str, **kwargs):
+    # values from the preferences
     # pylint: disable=too-many-statements
+    client_settings = get_client_settings()
     kwargs['client_settings'] = str(
         base64.b64encode(
             bytes(
-                json.dumps(get_client_settings()),
+                json.dumps(client_settings),
                 encoding='utf-8',
             )
         ),
         encoding='utf-8',
     )
+    kwargs['preferences'] = request.preferences
+    kwargs.update(client_settings)
 
     # values from the HTTP requests
     kwargs['endpoint'] = 'results' if 'q' in kwargs else request.endpoint
@@ -387,19 +398,6 @@ def render(template_name: str, **kwargs):
     kwargs['errors'] = request.errors
     kwargs['link_token'] = link_token.get_token()
 
-    # values from the preferences
-    kwargs['preferences'] = request.preferences
-    kwargs['autocomplete'] = request.preferences.get_value('autocomplete')
-    kwargs['favicon_resolver'] = request.preferences.get_value('favicon_resolver')
-    kwargs['infinite_scroll'] = request.preferences.get_value('infinite_scroll')
-    kwargs['search_on_category_select'] = request.preferences.get_value('search_on_category_select')
-    kwargs['hotkeys'] = request.preferences.get_value('hotkeys')
-    kwargs['results_on_new_tab'] = request.preferences.get_value('results_on_new_tab')
-    kwargs['advanced_search'] = request.preferences.get_value('advanced_search')
-    kwargs['query_in_title'] = request.preferences.get_value('query_in_title')
-    kwargs['safesearch'] = str(request.preferences.get_value('safesearch'))
-    kwargs['theme'] = request.preferences.get_value('theme')
-    kwargs['method'] = request.preferences.get_value('method')
     kwargs['categories_as_tabs'] = list(settings['categories_as_tabs'].keys())
     kwargs['categories'] = get_enabled_categories(settings['categories_as_tabs'].keys())
     kwargs['DEFAULT_CATEGORY'] = DEFAULT_CATEGORY
@@ -439,7 +437,6 @@ def render(template_name: str, **kwargs):
     kwargs['proxify_results'] = settings['result_proxy']['proxify_results']
     kwargs['cache_url'] = settings['ui']['cache_url']
     kwargs['get_result_template'] = get_result_template
-    kwargs['doi_resolver'] = get_doi_resolver(request.preferences)
     kwargs['opensearch_url'] = (
         url_for('opensearch')
         + '?'
@@ -517,7 +514,7 @@ def pre_request():
         preferences.parse_dict({"language": language})
         logger.debug('set language %s (from browser)', preferences.get_value("language"))
 
-    # locale is defined neither in settings nor in preferences
+    # UI locale is defined neither in settings nor in preferences
     # use browser headers
     if not preferences.get_value("locale"):
         locale = _get_browser_language(request, LOCALE_NAMES.keys())
@@ -621,6 +618,14 @@ def health():
 def client_token(token=None):
     link_token.ping(request, token)
     return Response('', mimetype='text/css')
+
+
+@app.route('/rss.xsl', methods=['GET', 'POST'])
+def rss_xsl():
+    return render_template(
+        f"{request.preferences.get_value('theme')}/rss.xsl",
+        url_for=custom_url_for,
+    )
 
 
 @app.route('/search', methods=['GET', 'POST'])
@@ -740,9 +745,6 @@ def search():
         response_rss = render(
             'opensearch_response_rss.xml',
             results=results,
-            answers=result_container.answers,
-            corrections=result_container.corrections,
-            suggestions=result_container.suggestions,
             q=request.form['q'],
             number_of_results=result_container.number_of_results,
         )
@@ -1223,6 +1225,30 @@ def stats_errors():
 def stats_checker():
     result = checker_get_result()
     return jsonify(result)
+
+
+@app.route('/metrics')
+def stats_open_metrics():
+    password = settings['general'].get("open_metrics")
+
+    if not (settings['general'].get("enable_metrics") and password):
+        return Response('open metrics is disabled', status=404, mimetype='text/plain')
+
+    if not request.authorization or request.authorization.password != password:
+        return Response('access forbidden', status=401, mimetype='text/plain')
+
+    filtered_engines = dict(filter(lambda kv: request.preferences.validate_token(kv[1]), engines.items()))
+
+    checker_results = checker_get_result()
+    checker_results = (
+        checker_results['engines'] if checker_results['status'] == 'ok' and 'engines' in checker_results else {}
+    )
+
+    engine_stats = get_engines_stats(filtered_engines)
+    engine_reliabilities = get_reliabilities(filtered_engines, checker_results)
+    metrics_text = openmetrics(engine_stats, engine_reliabilities)
+
+    return Response(metrics_text, mimetype='text/plain')
 
 
 @app.route('/robots.txt', methods=['GET'])

@@ -15,20 +15,18 @@
 # Ricky-Tigg <Ricky-Tigg@users.noreply.translate.codeberg.org>, 2024.
 msgid ""
 msgstr ""
-"Project-Id-Version: searx\n"
+"Project-Id-Version:  searx\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-10-05 06:24+0000\n"
-"PO-Revision-Date: 2024-10-08 13:41+0000\n"
-"Last-Translator: Ricky-Tigg <Ricky-Tigg@users.noreply.translate.codeberg.org>"
-"\n"
-"Language-Team: Finnish <https://translate.codeberg.org/projects/searxng/"
-"searxng/fi/>\n"
+"POT-Creation-Date: 2024-12-16 08:30+0000\n"
+"PO-Revision-Date: 2024-12-10 15:08+0000\n"
+"Last-Translator: artnay <artnay@users.noreply.translate.codeberg.org>\n"
 "Language: fi\n"
+"Language-Team: Finnish "
+"<https://translate.codeberg.org/projects/searxng/searxng/fi/>\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.7.2\n"
 "Generated-By: Babel 2.16.0\n"
 
 #. CONSTANT_NAMES['NO_SUBGROUPING']
@@ -304,7 +302,7 @@ msgid "active users"
 msgstr "aktiiviset käyttäjät"
 
 #. SOCIAL_MEDIA_TERMS['COMMENTS']
-#: searx/engines/discourse.py:157 searx/engines/hackernews.py:78
+#: searx/engines/discourse.py:157 searx/engines/hackernews.py:82
 #: searx/engines/lemmy.py:130 searx/searxng.msg
 msgid "comments"
 msgstr "kommentit"
@@ -320,7 +318,7 @@ msgid "community"
 msgstr "yhteisö"
 
 #. SOCIAL_MEDIA_TERMS['POINTS']
-#: searx/engines/hackernews.py:78 searx/searxng.msg
+#: searx/engines/hackernews.py:82 searx/searxng.msg
 msgid "points"
 msgstr "pisteet"
 
@@ -330,7 +328,7 @@ msgid "title"
 msgstr "Otsikko"
 
 #. SOCIAL_MEDIA_TERMS['AUTHOR']
-#: searx/engines/hackernews.py:81 searx/searxng.msg
+#: searx/engines/hackernews.py:85 searx/searxng.msg
 msgid "author"
 msgstr "tekijä"
 
@@ -349,28 +347,28 @@ msgstr "suljettu"
 msgid "answered"
 msgstr "vastattu"
 
-#: searx/webapp.py:332
+#: searx/webapp.py:323
 msgid "No item found"
 msgstr "Tietuetta ei löytynyt"
 
 #: searx/engines/qwant.py:288
-#: searx/templates/simple/result_templates/images.html:23 searx/webapp.py:334
+#: searx/templates/simple/result_templates/images.html:23 searx/webapp.py:325
 msgid "Source"
 msgstr "Lähde"
 
-#: searx/webapp.py:336
+#: searx/webapp.py:327
 msgid "Error loading the next page"
 msgstr "Virhe ladattaessa seuraavaa sivua"
 
-#: searx/webapp.py:495 searx/webapp.py:898
+#: searx/webapp.py:496 searx/webapp.py:904
 msgid "Invalid settings, please edit your preferences"
 msgstr "Virheelliset asetukset, muokkaa siis asetuksia"
 
-#: searx/webapp.py:511
+#: searx/webapp.py:512
 msgid "Invalid settings"
 msgstr "Virheelliset asetukset"
 
-#: searx/webapp.py:588 searx/webapp.py:670
+#: searx/webapp.py:589 searx/webapp.py:679
 msgid "search error"
 msgstr "hakuvirhe"
 
@@ -529,7 +527,7 @@ msgstr "Kirjan arvostelu"
 msgid "File quality"
 msgstr "Tiedoston laatu"
 
-#: searx/plugins/calculator.py:14
+#: searx/plugins/calculator.py:18
 msgid "Calculate mathematical expressions via the search bar"
 msgstr "Laske matemaattisia lausekkeita hakupalkissa"
 
@@ -548,8 +546,8 @@ msgstr "Isäntänimien laajennus"
 #: searx/plugins/hostnames.py:104
 msgid "Rewrite hostnames, remove results or prioritize them based on the hostname"
 msgstr ""
-"Kirjoita isäntänimiä uudelleen, poista tuloksia tai priorisoi ne isäntänimen "
-"perusteella"
+"Kirjoita isäntänimiä uudelleen, poista tuloksia tai priorisoi ne "
+"isäntänimen perusteella"
 
 #: searx/plugins/oa_doi_rewrite.py:12
 msgid "Open Access DOI rewrite"
@@ -711,7 +709,7 @@ msgid "proxied"
 msgstr "välityspalvelimella"
 
 #: searx/templates/simple/new_issue.html:64
-msgid "Start submiting a new issue on GitHub"
+msgid "Start submitting a new issue on GitHub"
 msgstr "Avaa uusi issue GitHubissa"
 
 #: searx/templates/simple/new_issue.html:66
@@ -785,23 +783,23 @@ msgstr "Oletusluokat"
 msgid "User interface"
 msgstr "Käyttöliittymä"
 
-#: searx/templates/simple/preferences.html:211
+#: searx/templates/simple/preferences.html:212
 msgid "Privacy"
 msgstr "Yksityisyys"
 
-#: searx/templates/simple/preferences.html:224
+#: searx/templates/simple/preferences.html:225
 msgid "Engines"
 msgstr "Hakukoneet"
 
-#: searx/templates/simple/preferences.html:226
+#: searx/templates/simple/preferences.html:227
 msgid "Currently used search engines"
 msgstr "Nyt käytetyt hakukoneet"
 
-#: searx/templates/simple/preferences.html:234
+#: searx/templates/simple/preferences.html:235
 msgid "Special Queries"
 msgstr "Erityiset kyselyt"
 
-#: searx/templates/simple/preferences.html:240
+#: searx/templates/simple/preferences.html:241
 msgid "Cookies"
 msgstr "Evästeet"
 
@@ -1375,6 +1373,26 @@ msgstr "Käyttöliittymän kieli"
 #: searx/templates/simple/preferences/ui_locale.html:14
 msgid "Change the language of the layout"
 msgstr "Vaihda asettelun kieltä"
+
+#: searx/templates/simple/preferences/urlformatting.html:2
+msgid "URL formatting"
+msgstr "URL-muotoilu"
+
+#: searx/templates/simple/preferences/urlformatting.html:8
+msgid "Pretty"
+msgstr "Nätti"
+
+#: searx/templates/simple/preferences/urlformatting.html:13
+msgid "Full"
+msgstr "Täysi"
+
+#: searx/templates/simple/preferences/urlformatting.html:18
+msgid "Host"
+msgstr "Isäntä"
+
+#: searx/templates/simple/preferences/urlformatting.html:23
+msgid "Change result URL formatting"
+msgstr "Vaihda tulosten URL-muotoilua"
 
 #: searx/templates/simple/result_templates/code.html:13
 msgid "repo"
@@ -1981,3 +1999,10 @@ msgstr "piilota video"
 
 #~ msgid "Engines cannot retrieve results"
 #~ msgstr "Moottorit eivät voi palauttaa tuloksia"
+
+#~ msgid "Start submiting a new issue on GitHub"
+#~ msgstr "Avaa uusi issue GitHubissa"
+
+#~ msgid "dummy"
+#~ msgstr ""
+
